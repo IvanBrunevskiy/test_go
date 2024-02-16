@@ -3,6 +3,7 @@ package main
 import (
 	routes "blog-server/src"
 	config "blog-server/src/config"
+	"github.com/rs/cors"
 	"log"
 	"path/filepath"
 
@@ -49,5 +50,15 @@ func main() {
 	//r.Use(middleware.Logger)
 
 	// Запуск сервера на порту 8080
-	http.ListenAndServe(":8080", r)
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3001"}, // Укажите разрешенные origin (адреса frontend-приложений)
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+
+	// Оборачиваем роутер в cors.Handler
+	handler := c.Handler(r)
+
+	// Запуск сервера на порту 8080
+	http.ListenAndServe(":8080", handler)
 }
